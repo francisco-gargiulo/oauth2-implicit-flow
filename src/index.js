@@ -1,22 +1,67 @@
-var debug = require("debug")("server:server");
-var http = require("http");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const session = require("express-session");
+const dotenv = require("dotenv");
 
-var app = require("./app");
-var port = 3000;
+const RedisStore = require("connect-redis")(session);
+const Redis = require("ioredis");
 
-app.set("port", port);
+dotenv.config();
 
-var server = http.createServer(app);
+const { SESSION_SECRET } = process.env;
 
-server.listen(port, () => onListening());
+// Create an Express app
+const app = express();
 
-function onListening() {
-  console.log("server listening on port", port);
+// Configure session middleware
+app.use(
+  session({
+    store: new RedisStore({ client: new Redis() }), // Use Redis to store session data
+    secret: SESSION_SECRET, // A secret key used to sign the session ID cookie
+    name: "sid", // Name of the session ID cookie
+    resave: false, // Do not save the session if it was not modified
+    saveUninitialized: true, // Save uninitialized sessions (i.e., new and not modified)
+  })
+);
 
-  var addr = server.address();
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+// Configure the app's views directory and view engine
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
-  debug("Listening on " + bind);
-}
+// Add middleware to log requests in the console
+app.use(logger("dev"));
 
-module.exports = server;
+// Parse incoming requests with JSON payloads
+app.use(express.json());
+
+// Parse incoming requests with urlencoded payloads
+app.use(express.urlencoded({ extended: false }));
+
+// Parse cookies sent with the request
+app.use(cookieParser());
+
+// Route all requests to the router module
+app.use("/", require("./router"));
+
+// Define an error handling middleware function that redirects to a specified URL with an error message
+app.use(function ({ code, description, status }, _, res, next) {
+  console.log({ code, description, status });
+  if (!code || !status) {
+    // If no error code is provided, respond with a generic server error
+    return res.status(500).json({
+      code: "server_error",
+      description: "Internal Server Error",
+    });
+  }
+
+  // Redirect to the URL with the error information in the query string
+  res.status(status).json({
+    error: code,
+    error_description: description,
+  });
+});
+
+// Export the Express app object for use in other modules
+module.exports = app;

@@ -1,4 +1,4 @@
-const OAuth2Error = require("./oauth2-error");
+const OAuth2Error = require("./oauth2Error");
 
 /**
  * `DefaultError`

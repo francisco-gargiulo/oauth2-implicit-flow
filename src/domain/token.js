@@ -1,12 +1,10 @@
-const { randomBytes } = require("crypto");
-
 module.exports = class Token {
-  constructor(sub, client_id) {
-    this.access_token = randomBytes(4).toString("hex");
-    this.token_type = "Bearer";
-    this.expires_in = 3600;
-    this.sub = sub;
-    this.client_id = client_id;
+  constructor(token) {
+    this.access_token = token.access_token;
+    this.token_type = token.token_type;
+    this.expires_in = token.expires_in;
+    this.sub = token.sub;
+    this.client_id = token.client_id;
   }
 
   toJSON = () => {

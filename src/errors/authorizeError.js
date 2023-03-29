@@ -1,9 +1,9 @@
-const OAuth2Error = require("./oauth2-error");
+const OAuth2Error = require("./oauth2Error");
 
 /**
- * `AuthorizationError`
+ * AuthorizeError
  */
-module.exports = class AuthorizationError extends OAuth2Error {
+module.exports = class AuthorizeError extends OAuth2Error {
   constructor(code, description) {
     let status;
 
@@ -30,6 +30,6 @@ module.exports = class AuthorizationError extends OAuth2Error {
 
     super(code, description, status);
 
-    this.name = "AuthorizationError";
+    this.name = "AuthorizeError";
   }
 };

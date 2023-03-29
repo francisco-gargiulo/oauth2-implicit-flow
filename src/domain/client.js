@@ -8,16 +8,16 @@ module.exports = class Client {
   constructor(client) {
     this.id = client.id;
     this.type = client.type;
-    this.secret = client.secret;
     this.redirect_uri = client.redirect_uri;
+    this.secret = client.secret;
   }
 
   toJSON = () => {
     return {
       id: this.id,
-      secret: this.secret,
       type: this.type,
       redirect_uri: this.redirect_uri,
+      secret: this.secret,
     };
   };
 };

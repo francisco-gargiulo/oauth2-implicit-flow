@@ -1,21 +1,34 @@
 const { randomUUID } = require("crypto");
-const db = require("./database");
+const database = require("./database");
 
 module.exports = class Repository {
   constructor(name) {
-    this.table = db[name] || {};
+    this.table = database[name] || {};
   }
 
-  create(entity) {
-    if (!entity) {
+  create(newEntity) {
+    if (!newEntity) {
       throw new Error("Entity required");
     }
 
-    delete entity.id;
+    delete newEntity.id;
 
     const id = randomUUID();
 
-    this.table[id] = { ...entity };
+    this.table[id] = { ...newEntity };
+
+    return {
+      id,
+      ...newEntity,
+    };
+  }
+
+  findById(id) {
+    const entity = this.table[id];
+
+    if (!entity) {
+      throw new Error("Entity not found");
+    }
 
     return {
       id,
@@ -23,27 +36,14 @@ module.exports = class Repository {
     };
   }
 
-  findById(id) {
-    var row = this.table[id];
-
-    if (!row) {
-      throw new Error("Entity not found");
-    }
-
-    return {
-      id,
-      ...row,
-    };
-  }
-
   findOne(query) {
-    for (const row in this.table) {
-      const obj = this.table[row];
+    for (const entityKey in this.table) {
+      const entity = this.table[entityKey];
 
-      let match;
-      for (const iterator in query) {
-        if (obj[iterator]) {
-          match = obj[iterator] === query[iterator];
+      let match = true;
+      for (const propertyKey in query) {
+        if (entity[propertyKey]) {
+          match = entity[propertyKey] === query[propertyKey];
 
           if (!match) {
             break;
@@ -52,32 +52,33 @@ module.exports = class Repository {
           continue;
         }
 
+        match = false;
         break;
       }
 
-      if (!match) {
-        continue;
+      if (match) {
+        return entity;
       }
-
-      return obj;
     }
+
+    throw new Error("Entity not found");
   }
 
-  update(id, entity) {
-    var row = this.table[id];
+  update(id, updatedValues) {
+    const entity = this.table[id];
 
-    if (!row) {
+    if (!entity) {
       throw new Error("Entity not found");
     }
 
     this.table[id] = {
-      ...row,
       ...entity,
+      ...updatedValues,
     };
 
     return {
       id,
-      ...entity,
+      ...updatedValues,
     };
   }
 

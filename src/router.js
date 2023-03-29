@@ -11,14 +11,10 @@ router.get("/", function (req, res) {
  *
  * {@link https://www.rfc-editor.org/rfc/rfc6749#section-3 | Protocol endpoints}
  */
-router.use("/authorize", require("./controllers/authorization"));
-router.use("/token", require("./controllers/token"));
+router.use("/authorize", require("./controllers/authorize"));
 
 // session
 router.use("/login", require("./controllers/login"));
 router.use("/logout", require("./controllers/logout"));
-
-// protected resource
-router.use("/userinfo", require("./controllers/userinfo"));
 
 module.exports = router;

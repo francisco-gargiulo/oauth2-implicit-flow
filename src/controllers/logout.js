@@ -13,7 +13,8 @@ router.get("/", function (req, res, next) {
         return next(err);
       }
 
-      res.redirect("http://localhost:8080");
+      // TODO: redirect to the client's logout URL
+      res.redirect("http://localhost:3000");
     });
   });
 });

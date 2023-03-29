@@ -3,19 +3,20 @@ const Repository = require("../repository");
 
 const clientRepository = new Repository("client");
 
-function issueClient(data) {
-  const client = new Client(data);
+function findClient(clientId) {
+  let client;
 
-  return clientRepository.create(client);
-}
+  try {
+    const entity = clientRepository.findById(clientId);
 
-function findClient(id) {
-  const client = clientRepository.findById(id);
+    client = new Client(entity);
+  } catch (error) {
+    console.error(error);
+  }
 
   return client;
 }
 
 module.exports = {
-  issueClient,
   findClient,
 };

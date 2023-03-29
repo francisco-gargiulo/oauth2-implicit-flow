@@ -1,16 +1,35 @@
+const jwt = require("jsonwebtoken");
+
 const Repository = require("../repository");
 const Token = require("../domain/token");
 
 const tokenRepository = new Repository("token");
 
-function issueToken(user, client) {
-  const token = new Token(user.sub, client.id);
+function issueToken(sub, email, nickname) {
+  if (!sub) {
+    throw new Error("sub required");
+  }
 
-  return tokenRepository.create(token.toJSON());
+  const entity = tokenRepository.create({
+    access_token: jwt.sign({ sub, email, nickname }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    }),
+    token_type: "Bearer",
+    expires_in: 3600,
+  });
+
+  return new Token(entity);
 }
 
-function findTokenByAccessToken(access_token) {
-  const token = tokenRepository.findOne({ access_token });
+function findTokenByAccessToken(accessToken) {
+  let token;
+  try {
+    const entity = tokenRepository.findOne({ access_token: accessToken });
+
+    token = new Token(entity);
+  } catch (error) {
+    console.error(error);
+  }
 
   return token;
 }

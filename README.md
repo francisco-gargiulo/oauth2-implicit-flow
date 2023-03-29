@@ -5,10 +5,10 @@ This is a Node.js implementation of the OAuth 2.0 protocol, designed to provide 
 ## Features
 
 - Implements the OAuth 2.0 specification using the latest security standards
-- Supports different authorization flows including authorization code, implicit, client credentials, and password grants
-- User authentication is performed using secure authentication mechanisms like JWT and OAuth tokens
+- Supports only authorization flow implicit grant
+- User authentication is performed using One-Time Password mechanism
 - Easy to use and configure for your specific use case
-- Supports multiple clients and scopes for more granular control over access to resources
+- Supports multiple clients
   
 ## Getting Started
 
